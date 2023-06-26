@@ -63,6 +63,9 @@
   function getBookings() {
     let reserved_slots = []
     const date = document.getElementById('reservation_date').value
+    if (date == ''){
+      return
+    }
     document.getElementById('today').innerHTML = date
     
     fetch("{% url 'bookings' %}" + '?date=' + date)
@@ -72,13 +75,28 @@
         bookings = ''
         
         /* Step 11: Part three */
-        for (const item in data) {
-          console.log(item.fields)
-          reserved_slots.push(item.fields)
+        for (idx in data) {
+          console.log(data[idx].fields)
+          if (data!=[]) {
+            reserved_slots.push(data[idx].fields.reservation_slot)
+            bookings += `<p>${data[idx].fields.first_name} - ${formatTime(data[idx].fields.reservation_slot)}</p>`
+          }
+
         }
 
         /* Step 12: Part four  */
+        slot_options = '<option value="0" disabled>Select time</option>'
 
+        for (let index = 11; index < 20; index++) {
+          const label = formatTime(index)
+          if (reserved_slots.includes(index)) {
+            slot_options += `<option value=${index} disabled>${label}</option>`
+          } else {
+            slot_options += `<option value=${index}>${label}</option>`
+          }
+
+          
+        }
         
         document.getElementById('reservation_slot').innerHTML = slot_options
         if(bookings==''){
